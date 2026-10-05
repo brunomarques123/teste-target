@@ -1,0 +1,14 @@
+## .NET
+bin/
+obj/
+.vs/
+*.user
+
+## Angular / Node (o frontend também tem o próprio .gitignore)
+node_modules/
+dist/
+.angular/
+
+## Configuração local de ferramentas (não faz parte da solução)
+.claude/
+backend/.github/

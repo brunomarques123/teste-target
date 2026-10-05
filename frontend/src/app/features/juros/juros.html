@@ -1,0 +1,82 @@
+<header class="pagina-titulo">
+  <h2>Juros por atraso</h2>
+  <p class="descricao">
+    Juros simples de 2,5% ao dia sobre o valor, contados do vencimento até hoje:
+    valor × 2,5% × dias de atraso.
+  </p>
+</header>
+
+<section class="cartao">
+  <h3>Dados do título</h3>
+  <form [formGroup]="form" (ngSubmit)="calcular()" class="formulario formulario-3">
+    <label>
+      Valor (R$)
+      <input type="number" step="0.01" min="0" formControlName="valor" placeholder="0,00" />
+      @if (form.controls.valor.touched && form.controls.valor.invalid) {
+        <span class="campo-erro">Informe um valor maior que zero.</span>
+      }
+    </label>
+
+    <label>
+      Data de vencimento
+      <input type="date" formControlName="vencimento" />
+      @if (form.controls.vencimento.touched && form.controls.vencimento.invalid) {
+        <span class="campo-erro">Informe a data.</span>
+      }
+    </label>
+
+    <div class="acoes">
+      <button type="submit" [disabled]="enviando()">{{ enviando() ? 'Calculando...' : 'Calcular juros' }}</button>
+    </div>
+  </form>
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+</section>
+
+@if (resultado(); as r) {
+  <section class="resumo">
+    <div class="indicador">
+      <span>Dias de atraso</span>
+      <strong>{{ r.diasAtraso }}</strong>
+    </div>
+    <div class="indicador">
+      <span>Juros</span>
+      <strong>{{ r.juros | currency: 'BRL' }}</strong>
+    </div>
+    <div class="indicador destaque">
+      <span>Total a pagar</span>
+      <strong>{{ r.valorTotal | currency: 'BRL' }}</strong>
+    </div>
+  </section>
+
+  <section class="cartao">
+    <h3>Detalhes do cálculo</h3>
+    <div class="tabela-rolagem">
+      <table>
+        <tbody>
+          <tr>
+            <td>Valor original</td>
+            <td class="num">{{ r.valor | currency: 'BRL' }}</td>
+          </tr>
+          <tr>
+            <td>Vencimento</td>
+            <td class="num">{{ r.vencimento | date: 'dd/MM/yyyy' }}</td>
+          </tr>
+          <tr>
+            <td>Data do cálculo (hoje)</td>
+            <td class="num">{{ r.dataCalculo | date: 'dd/MM/yyyy' }}</td>
+          </tr>
+          <tr>
+            <td>Taxa diária</td>
+            <td class="num">{{ r.taxaDiaria | percent: '1.1-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    @if (r.diasAtraso === 0) {
+      <p class="vazio">Sem atraso: o título ainda não venceu (ou vence hoje), portanto não há juros.</p>
+    }
+  </section>
+}

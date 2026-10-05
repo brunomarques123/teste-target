@@ -1,0 +1,68 @@
+<header class="pagina-titulo">
+  <h2>Comissão por vendedor</h2>
+  <p class="descricao">A comissão é calculada venda a venda, de acordo com o valor:</p>
+  <div class="faixas">
+    <span class="faixa">Abaixo de R$ 100,00 · <strong>sem comissão</strong></span>
+    <span class="faixa">R$ 100,00 a R$ 499,99 · <strong>1%</strong></span>
+    <span class="faixa">A partir de R$ 500,00 · <strong>5%</strong></span>
+  </div>
+</header>
+
+<section class="cartao">
+  <div class="cartao-topo">
+    <div>
+      <h3>Vendas do time comercial</h3>
+      <p class="texto-suave">As vendas estão gravadas no SQL Server (tabela Venda) e o cálculo é feito pela API.</p>
+    </div>
+    <button type="button" [disabled]="carregando()" (click)="calcular()">
+      {{ carregando() ? 'Calculando...' : 'Calcular comissões' }}
+    </button>
+  </div>
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+</section>
+
+@if (resultado(); as r) {
+  <section class="resumo">
+    <div class="indicador">
+      <span>Total vendido</span>
+      <strong>{{ r.totalVendido | currency: 'BRL' }}</strong>
+    </div>
+    <div class="indicador destaque">
+      <span>Total de comissões</span>
+      <strong>{{ r.totalComissao | currency: 'BRL' }}</strong>
+    </div>
+    <div class="indicador">
+      <span>Vendedores</span>
+      <strong>{{ r.vendedores.length }}</strong>
+    </div>
+  </section>
+
+  <section class="cartao">
+    <h3>Comissão por vendedor</h3>
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr>
+            <th>Vendedor</th>
+            <th class="num">Vendas</th>
+            <th class="num">Total vendido</th>
+            <th class="num">Comissão</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of r.vendedores; track v.vendedor) {
+            <tr>
+              <td>{{ v.vendedor }}</td>
+              <td class="num">{{ v.quantidadeVendas }}</td>
+              <td class="num">{{ v.totalVendido | currency: 'BRL' }}</td>
+              <td class="num">{{ v.totalComissao | currency: 'BRL' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+}

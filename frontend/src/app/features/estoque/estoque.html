@@ -1,0 +1,126 @@
+<header class="pagina-titulo">
+  <h2>Movimentação de estoque</h2>
+  <p class="descricao">
+    Lance entradas e saídas. Cada movimentação recebe um número único e retorna o saldo final do produto.
+  </p>
+</header>
+
+<section class="cartao">
+  <h3>Nova movimentação</h3>
+  <form [formGroup]="form" (ngSubmit)="registrar()" class="formulario formulario-4">
+    <label class="campo-largo">
+      Produto
+      <select formControlName="codigoProduto">
+        <option [ngValue]="0" disabled>Selecione...</option>
+        @for (p of produtos(); track p.codigo) {
+          <option [ngValue]="p.codigo">{{ p.codigo }} · {{ p.descricao }}</option>
+        }
+      </select>
+      @if (form.controls.codigoProduto.touched && form.controls.codigoProduto.invalid) {
+        <span class="campo-erro">Selecione um produto.</span>
+      }
+    </label>
+
+    <label>
+      Tipo
+      <select formControlName="tipo">
+        <option value="Entrada">Entrada</option>
+        <option value="Saida">Saída</option>
+      </select>
+    </label>
+
+    <label>
+      Quantidade
+      <input type="number" min="1" formControlName="quantidade" />
+      @if (form.controls.quantidade.touched && form.controls.quantidade.invalid) {
+        <span class="campo-erro">Mínimo 1.</span>
+      }
+    </label>
+
+    <label class="campo-extra">
+      Descrição da movimentação
+      <input type="text" formControlName="descricao" placeholder="Ex.: Compra de fornecedor" />
+      @if (form.controls.descricao.touched && form.controls.descricao.invalid) {
+        <span class="campo-erro">Informe a descrição.</span>
+      }
+    </label>
+
+    <div class="acoes">
+      <button type="submit" [disabled]="enviando()">{{ enviando() ? 'Registrando...' : 'Registrar' }}</button>
+    </div>
+  </form>
+
+  @if (erro()) {
+    <p class="erro">{{ erro() }}</p>
+  }
+  @if (ultima(); as m) {
+    <p class="sucesso">
+      Movimentação nº {{ m.id }} registrada ({{ m.tipo === 'Entrada' ? 'entrada' : 'saída' }} de {{ m.quantidade }}).
+      <strong>Saldo final de {{ m.descricaoProduto }}: {{ m.saldoFinal }}</strong>
+    </p>
+  }
+</section>
+
+<section class="cartao">
+  <h3>Saldo atual</h3>
+  <div class="tabela-rolagem">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Produto</th>
+          <th class="num">Estoque</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of produtos(); track p.codigo) {
+          <tr>
+            <td>{{ p.codigo }}</td>
+            <td>{{ p.descricao }}</td>
+            <td class="num">{{ p.estoque }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="cartao">
+  <h3>Histórico de movimentações</h3>
+  @if (historico().length === 0) {
+    <p class="vazio">Nenhuma movimentação registrada ainda.</p>
+  } @else {
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr>
+            <th>Nº</th>
+            <th>Data</th>
+            <th>Produto</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+            <th class="num">Qtde</th>
+            <th class="num">Saldo final</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of historico(); track m.id) {
+            <tr>
+              <td>{{ m.id }}</td>
+              <td>{{ m.dataHora | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ m.descricaoProduto }}</td>
+              <td>
+                <span class="selo" [class.selo-entrada]="m.tipo === 'Entrada'" [class.selo-saida]="m.tipo === 'Saida'">
+                  {{ m.tipo === 'Entrada' ? 'Entrada' : 'Saída' }}
+                </span>
+              </td>
+              <td>{{ m.descricao }}</td>
+              <td class="num">{{ m.quantidade }}</td>
+              <td class="num">{{ m.saldoFinal }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
